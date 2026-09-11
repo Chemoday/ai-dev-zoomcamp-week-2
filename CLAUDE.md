@@ -2,9 +2,10 @@
 
 This is the Module 2 project for the AI-dev Zoomcamp. See
 `product-spec.md` for the full, authoritative spec (business logic, API
-contract, UI/UX, implementation roadmap, and AI-generation guardrails)
-and `_plan/module_syllabus.md` for the module context and deliverable
-list.
+contract, UI/UX, implementation roadmap, and AI-generation guardrails),
+`docs/ui-spec.md` for the detailed screen/state/transition brief used
+for frontend generation, and `_plan/module_syllabus.md` for the module
+context and deliverable list.
 
 ## Tech stack
 

@@ -10,6 +10,8 @@ here — that's Module 3.
       contract, UI/UX spec, and AI-generation guardrails
 
 ## 2. Phase 1 — Frontend first, with a mock layer
+- [ ] Read `docs/ui-spec.md` for the full screen/state/transition brief
+      before generating any frontend code
 - [ ] Initialize Vite + Vue 3 + Tailwind CSS project in `frontend/`
 - [ ] Implement `src/services/api.js`: in-memory/`localStorage` mock
       store (5 default tables, 2 initial reservations, ~200ms simulated
