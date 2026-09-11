@@ -29,10 +29,18 @@ Built with Claude Design, committed raw, then reconciled: renamed
 API from `src/api/mock_api.js` to `src/services/api.js` per spec
 section 2's layout. Verified with `npm run build`.
 
-## 3. Formalize the OpenAPI contract
-- [ ] Write `openapi.yaml` from spec section 4 (Table/Reservation
+## 3. Formalize the OpenAPI contract — done
+- [x] Write `openapi.yaml` from spec section 4 (Table/Reservation
       schemas, all REST endpoints, error responses) — this becomes the
       binding contract both sides implement against from here on
+
+Written to match what `frontend/src/services/api.js` actually
+implements (validated with `openapi-spec-validator`), which in a few
+spots is more precise than `product-spec.md` §4's narrative sketch —
+see the Notes block at the bottom of `openapi.yaml`: `GET /api/availability`
+takes a required `party_size` and returns one entry per table
+(`is_reserved`/`fits_party`/`is_available`) instead of a bare boolean
+map, and `table_number` is an integer, not the spec's string example.
 
 ## 4. Phase 2 — FastAPI backend
 - [ ] Scaffold `backend/app/` (`main.py`, `database.py`, `models.py`,

@@ -1,0 +1,385 @@
+openapi: 3.0.3
+info:
+  title: Interactive Restaurant Table Reservation System API
+  version: "0.1.0"
+  description: >
+    Contract between the Vue frontend and the FastAPI backend for the
+    Interactive Restaurant Table Reservation System (Module 2). This
+    file is the source of truth for both sides going forward, per
+    `_plan/roadmap.md` step 3 — it reflects the endpoints the frontend
+    prototype actually calls (`frontend/src/services/api.js`), which in
+    a few places is more precise than the narrative sketch in
+    `product-spec.md` section 4 (see the Notes below).
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+paths:
+  /api/tables:
+    get:
+      summary: List all tables on the floor grid
+      operationId: listTables
+      tags: [tables]
+      responses:
+        "200":
+          description: All physical tables
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Table"
+    post:
+      summary: Place a new table on the grid (staff only)
+      operationId: createTable
+      tags: [tables]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TableCreate"
+      responses:
+        "201":
+          description: Table created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Table"
+        "409":
+          description: >
+            table_number is already in use, or (grid_x, grid_y) is
+            already occupied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/tables/{table_id}:
+    delete:
+      summary: Delete an existing table (staff only)
+      operationId: deleteTable
+      tags: [tables]
+      parameters:
+        - $ref: "#/components/parameters/TableId"
+      responses:
+        "200":
+          description: Table deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTableResult"
+        "400":
+          description: Table has active or future reservations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Table not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/availability:
+    get:
+      summary: Check per-table availability for a date/time window and party size
+      operationId: getAvailability
+      tags: [availability]
+      parameters:
+        - $ref: "#/components/parameters/Date"
+        - $ref: "#/components/parameters/StartTime"
+        - $ref: "#/components/parameters/Duration"
+        - name: party_size
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Guests in the party, used to compute fits_party
+      responses:
+        "200":
+          description: One entry per table
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AvailabilityEntry"
+
+  /api/reservations:
+    get:
+      summary: List reservations for a given date (staff view)
+      operationId: listReservations
+      tags: [reservations]
+      parameters:
+        - $ref: "#/components/parameters/Date"
+      responses:
+        "200":
+          description: Reservations for the date, sorted by start_time
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reservation"
+    post:
+      summary: Book a table
+      operationId: createReservation
+      tags: [reservations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationCreate"
+      responses:
+        "201":
+          description: Reservation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "409":
+          description: Table is already booked for an overlapping window
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/reservations/{reservation_id}:
+    delete:
+      summary: Cancel an active reservation
+      operationId: cancelReservation
+      tags: [reservations]
+      parameters:
+        - name: reservation_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reservation canceled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResult"
+        "404":
+          description: Reservation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  parameters:
+    TableId:
+      name: table_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    Date:
+      name: date
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+      description: ISO date (YYYY-MM-DD)
+    StartTime:
+      name: start_time
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 21
+      description: Integer hour, operating window is 10..21
+    Duration:
+      name: duration
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 4
+
+  schemas:
+    TableType:
+      type: string
+      enum: [ROUND_2, RECT_4, LONG_6]
+      description: ROUND_2=2 seats, RECT_4=4 seats, LONG_6=6 seats
+
+    Table:
+      type: object
+      required: [id, table_number, capacity, table_type, grid_x, grid_y]
+      properties:
+        id:
+          type: integer
+        table_number:
+          type: integer
+          description: Unique, staff-facing table label
+        capacity:
+          type: integer
+        table_type:
+          $ref: "#/components/schemas/TableType"
+        grid_x:
+          type: integer
+          minimum: 0
+          maximum: 5
+        grid_y:
+          type: integer
+          minimum: 0
+          maximum: 5
+
+    TableCreate:
+      type: object
+      required: [table_number, capacity, table_type, grid_x, grid_y]
+      properties:
+        table_number:
+          type: integer
+        capacity:
+          type: integer
+        table_type:
+          $ref: "#/components/schemas/TableType"
+        grid_x:
+          type: integer
+          minimum: 0
+          maximum: 5
+        grid_y:
+          type: integer
+          minimum: 0
+          maximum: 5
+
+    AvailabilityEntry:
+      type: object
+      required: [table_id, is_reserved, fits_party, is_available]
+      properties:
+        table_id:
+          type: integer
+        is_reserved:
+          type: boolean
+          description: Has an overlapping reservation in the requested window
+        fits_party:
+          type: boolean
+          description: capacity >= requested party_size
+        is_available:
+          type: boolean
+          description: "!is_reserved && fits_party — drives the guest grid coloring"
+
+    Reservation:
+      type: object
+      required:
+        - id
+        - table_id
+        - customer_name
+        - customer_phone
+        - reservation_date
+        - start_time
+        - duration
+      properties:
+        id:
+          type: integer
+        table_id:
+          type: integer
+        customer_name:
+          type: string
+        customer_phone:
+          type: string
+        reservation_date:
+          type: string
+          format: date
+        start_time:
+          type: integer
+          minimum: 10
+          maximum: 21
+        duration:
+          type: integer
+          minimum: 1
+          maximum: 4
+        end_time:
+          type: integer
+          description: >
+            Read-only, server-computed as start_time + duration.
+            Convenience field for consumers that don't want to
+            recompute it; the frontend prototype currently derives the
+            display window client-side instead.
+          readOnly: true
+
+    ReservationCreate:
+      type: object
+      required:
+        - table_id
+        - customer_name
+        - customer_phone
+        - reservation_date
+        - start_time
+        - duration
+      properties:
+        table_id:
+          type: integer
+        customer_name:
+          type: string
+          minLength: 1
+        customer_phone:
+          type: string
+          minLength: 1
+        reservation_date:
+          type: string
+          format: date
+        start_time:
+          type: integer
+          minimum: 10
+          maximum: 21
+        duration:
+          type: integer
+          minimum: 1
+          maximum: 4
+
+    DeleteTableResult:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      example:
+        success: true
+        message: Table deleted successfully
+
+    SuccessResult:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+      example:
+        success: true
+
+    Error:
+      type: object
+      required: [detail]
+      properties:
+        detail:
+          type: string
+      example:
+        detail: Cannot delete table with active bookings.
+
+# Notes on where this contract is more precise than product-spec.md §4:
+#
+# - GET /api/availability takes `party_size` (required) and returns one
+#   AvailabilityEntry per table (is_reserved / fits_party / is_available),
+#   not a bare {table_id: boolean} map. The richer shape is what the
+#   frontend needs to distinguish the "too small" vs. "reserved" grid
+#   cell states from docs/ui-spec.md section 5 — a boolean alone can't
+#   tell those apart.
+# - `table_number` is an integer here (the frontend uses 1..9), not the
+#   string example ("T-1") shown in product-spec.md §4.1.
+# - DELETE /api/tables/{id} and DELETE /api/reservations/{id} response
+#   bodies follow product-spec.md §4.2 exactly; the frontend mock
+#   doesn't currently inspect them, so either shape would have worked,
+#   but keeping the documented shape costs nothing.
