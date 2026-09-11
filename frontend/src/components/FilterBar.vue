@@ -30,14 +30,14 @@ const legend = computed(() =>
 
     <label class="min-w-[130px]">
       <span class="field-label">Time</span>
-      <select v-model.number="filters.start_hour" class="input" @change="refresh_availability">
+      <select v-model.number="filters.start_time" class="input" @change="refresh_availability">
         <option v-for="hour in HOURS" :key="hour" :value="hour">{{ format_hour(hour) }}</option>
       </select>
     </label>
 
     <label class="min-w-[120px]">
       <span class="field-label">Duration</span>
-      <select v-model.number="filters.duration_hours" class="input" @change="refresh_availability">
+      <select v-model.number="filters.duration" class="input" @change="refresh_availability">
         <option :value="1">1 hour</option>
         <option :value="2">2 hours</option>
         <option :value="3">3 hours</option>

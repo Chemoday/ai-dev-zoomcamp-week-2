@@ -4,7 +4,7 @@ import TableShape from './TableShape.vue'
 import { useRestaurant } from '../composables/useRestaurant'
 import { useToasts } from '../composables/useToasts'
 import { TYPE_LABEL, format_window, format_day, tilt_for } from '../utils/format'
-import { today_iso } from '../api/mock_api'
+import { today_iso } from '../services/api'
 
 const props = defineProps({ table: { type: Object, required: true } })
 const emit = defineEmits(['close'])
@@ -73,7 +73,7 @@ async function confirm_delete() {
           </div>
           <div class="text-right text-xs">
             <p>{{ booking.reservation_date === today_iso() ? 'Today' : format_day(booking.reservation_date) }}</p>
-            <p class="text-text-secondary">{{ format_window(booking.start_hour, booking.duration_hours) }}</p>
+            <p class="text-text-secondary">{{ format_window(booking.start_time, booking.duration) }}</p>
           </div>
         </div>
       </div>

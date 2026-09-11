@@ -14,8 +14,8 @@ export function format_hour(hour) {
   return `${base}:00 ${suffix}`
 }
 
-export function format_window(start_hour, duration_hours) {
-  return `${format_hour(start_hour)} – ${format_hour(start_hour + duration_hours)}`
+export function format_window(start_time, duration) {
+  return `${format_hour(start_time)} – ${format_hour(start_time + duration)}`
 }
 
 export function format_day(date_iso) {

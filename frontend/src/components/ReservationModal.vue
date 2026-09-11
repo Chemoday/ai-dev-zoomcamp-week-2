@@ -15,8 +15,8 @@ const form = reactive({
   customer_name: '',
   customer_phone: '',
   reservation_date: filters.date,
-  start_hour: filters.start_hour,
-  duration_hours: filters.duration_hours
+  start_time: filters.start_time,
+  duration: filters.duration
 })
 
 const status = ref('default') // default | submitting | success
@@ -128,13 +128,13 @@ async function submit() {
           </label>
           <label class="flex-1">
             <span class="field-label">Time</span>
-            <select v-model.number="form.start_hour" class="input">
+            <select v-model.number="form.start_time" class="input">
               <option v-for="hour in HOURS" :key="hour" :value="hour">{{ format_hour(hour) }}</option>
             </select>
           </label>
           <label class="flex-1">
             <span class="field-label">Duration</span>
-            <select v-model.number="form.duration_hours" class="input">
+            <select v-model.number="form.duration" class="input">
               <option :value="1">1 hour</option>
               <option :value="2">2 hours</option>
               <option :value="3">3 hours</option>

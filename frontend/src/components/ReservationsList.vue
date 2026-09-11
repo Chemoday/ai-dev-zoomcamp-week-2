@@ -45,7 +45,7 @@ function table_for(table_id) {
               Table {{ table_for(reservation.table_id)?.table_number ?? '—' }}
             </td>
             <td class="border-b border-black/5 px-2 py-2">
-              {{ format_window(reservation.start_hour, reservation.duration_hours) }}
+              {{ format_window(reservation.start_time, reservation.duration) }}
             </td>
           </tr>
         </tbody>

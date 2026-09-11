@@ -19,21 +19,21 @@ function seed() {
   const date = today_iso()
   db = {
     tables: [
-      { id: 1, table_number: 1, capacity: 2, table_type: 'ROUND_2', pos_x: 0, pos_y: 0 },
-      { id: 2, table_number: 2, capacity: 2, table_type: 'ROUND_2', pos_x: 2, pos_y: 0 },
-      { id: 3, table_number: 3, capacity: 4, table_type: 'RECT_4', pos_x: 4, pos_y: 0 },
-      { id: 4, table_number: 4, capacity: 4, table_type: 'RECT_4', pos_x: 1, pos_y: 2 },
-      { id: 5, table_number: 5, capacity: 6, table_type: 'LONG_6', pos_x: 3, pos_y: 2 },
-      { id: 6, table_number: 6, capacity: 2, table_type: 'ROUND_2', pos_x: 5, pos_y: 2 },
-      { id: 7, table_number: 7, capacity: 4, table_type: 'RECT_4', pos_x: 0, pos_y: 4 },
-      { id: 8, table_number: 8, capacity: 6, table_type: 'LONG_6', pos_x: 2, pos_y: 4 },
-      { id: 9, table_number: 9, capacity: 4, table_type: 'RECT_4', pos_x: 4, pos_y: 5 }
+      { id: 1, table_number: 1, capacity: 2, table_type: 'ROUND_2', grid_x: 0, grid_y: 0 },
+      { id: 2, table_number: 2, capacity: 2, table_type: 'ROUND_2', grid_x: 2, grid_y: 0 },
+      { id: 3, table_number: 3, capacity: 4, table_type: 'RECT_4', grid_x: 4, grid_y: 0 },
+      { id: 4, table_number: 4, capacity: 4, table_type: 'RECT_4', grid_x: 1, grid_y: 2 },
+      { id: 5, table_number: 5, capacity: 6, table_type: 'LONG_6', grid_x: 3, grid_y: 2 },
+      { id: 6, table_number: 6, capacity: 2, table_type: 'ROUND_2', grid_x: 5, grid_y: 2 },
+      { id: 7, table_number: 7, capacity: 4, table_type: 'RECT_4', grid_x: 0, grid_y: 4 },
+      { id: 8, table_number: 8, capacity: 6, table_type: 'LONG_6', grid_x: 2, grid_y: 4 },
+      { id: 9, table_number: 9, capacity: 4, table_type: 'RECT_4', grid_x: 4, grid_y: 5 }
     ],
     reservations: [
-      { id: 1, table_id: 2, customer_name: 'Marguerite Hale', customer_phone: '(555) 014 8820', reservation_date: date, start_hour: 18, duration_hours: 3 },
-      { id: 2, table_id: 5, customer_name: 'Ivo Brandt', customer_phone: '(555) 902 1177', reservation_date: date, start_hour: 19, duration_hours: 3 },
-      { id: 3, table_id: 7, customer_name: 'Dala Okonkwo', customer_phone: '(555) 771 3390', reservation_date: date, start_hour: 21, duration_hours: 2 },
-      { id: 4, table_id: 3, customer_name: 'Petra Lindqvist', customer_phone: '(555) 336 0042', reservation_date: date, start_hour: 12, duration_hours: 2 }
+      { id: 1, table_id: 2, customer_name: 'Marguerite Hale', customer_phone: '(555) 014 8820', reservation_date: date, start_time: 18, duration: 3 },
+      { id: 2, table_id: 5, customer_name: 'Ivo Brandt', customer_phone: '(555) 902 1177', reservation_date: date, start_time: 19, duration: 3 },
+      { id: 3, table_id: 7, customer_name: 'Dala Okonkwo', customer_phone: '(555) 771 3390', reservation_date: date, start_time: 21, duration: 2 },
+      { id: 4, table_id: 3, customer_name: 'Petra Lindqvist', customer_phone: '(555) 336 0042', reservation_date: date, start_time: 12, duration: 2 }
     ],
     next_id: 100
   }
@@ -55,11 +55,11 @@ function respond(value) {
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 
-function overlaps(reservation, date, start_hour, duration_hours) {
+function overlaps(reservation, date, start_time, duration) {
   return (
     reservation.reservation_date === date &&
-    reservation.start_hour < start_hour + duration_hours &&
-    start_hour < reservation.start_hour + reservation.duration_hours
+    reservation.start_time < start_time + duration &&
+    start_time < reservation.start_time + reservation.duration
   )
 }
 
@@ -68,12 +68,12 @@ export function fetch_tables() {
   return respond(() => clone(db.tables))
 }
 
-/** GET /api/availability?date=&start_hour=&duration_hours=&party_size= */
-export function fetch_availability({ date, start_hour, duration_hours, party_size }) {
+/** GET /api/availability?date=&start_time=&duration=&party_size= */
+export function fetch_availability({ date, start_time, duration, party_size }) {
   return respond(() =>
     db.tables.map((table) => {
       const is_reserved = db.reservations.some(
-        (r) => r.table_id === table.id && overlaps(r, date, start_hour, duration_hours)
+        (r) => r.table_id === table.id && overlaps(r, date, start_time, duration)
       )
       return {
         table_id: table.id,
@@ -89,7 +89,7 @@ export function fetch_availability({ date, start_hour, duration_hours, party_siz
 export function fetch_reservations(date) {
   return respond(() =>
     clone(db.reservations.filter((r) => !date || r.reservation_date === date))
-      .sort((a, b) => a.start_hour - b.start_hour)
+      .sort((a, b) => a.start_time - b.start_time)
   )
 }
 
@@ -101,7 +101,7 @@ export function create_reservation(payload) {
       db.reservations.some(
         (r) =>
           r.table_id === payload.table_id &&
-          overlaps(r, payload.reservation_date, payload.start_hour, payload.duration_hours)
+          overlaps(r, payload.reservation_date, payload.start_time, payload.duration)
       )
     if (conflict) {
       demo_flags.force_conflict = false
@@ -121,7 +121,7 @@ export function create_table(payload) {
       db.tables.some(
         (t) =>
           t.table_number === payload.table_number ||
-          (t.pos_x === payload.pos_x && t.pos_y === payload.pos_y)
+          (t.grid_x === payload.grid_x && t.grid_y === payload.grid_y)
       )
     if (taken) {
       demo_flags.force_conflict = false

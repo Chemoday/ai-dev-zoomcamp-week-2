@@ -1,5 +1,5 @@
 <script setup>
-import { demo_flags, reset_data, clear_floor } from '../api/mock_api'
+import { demo_flags, reset_data, clear_floor } from '../services/api'
 import { useRestaurant } from '../composables/useRestaurant'
 
 const emit = defineEmits(['close'])

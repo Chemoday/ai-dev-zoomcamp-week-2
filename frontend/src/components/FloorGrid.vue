@@ -20,13 +20,13 @@ const GRID_SIZE = 6
 const cells = computed(() => {
   const by_coord = {}
   tables.value.forEach((table) => {
-    by_coord[`${table.pos_x},${table.pos_y}`] = table
+    by_coord[`${table.grid_x},${table.grid_y}`] = table
   })
 
   const list = []
-  for (let pos_y = 0; pos_y < GRID_SIZE; pos_y += 1) {
-    for (let pos_x = 0; pos_x < GRID_SIZE; pos_x += 1) {
-      const table = by_coord[`${pos_x},${pos_y}`] || null
+  for (let grid_y = 0; grid_y < GRID_SIZE; grid_y += 1) {
+    for (let grid_x = 0; grid_x < GRID_SIZE; grid_x += 1) {
+      const table = by_coord[`${grid_x},${grid_y}`] || null
       const entry = table ? availability_by_table.value[table.id] : null
       let state = 'empty'
       if (table) {
@@ -35,14 +35,14 @@ const cells = computed(() => {
         else if (entry && !entry.fits_party) state = 'too_small'
         else state = 'available'
       }
-      list.push({ key: `${pos_x},${pos_y}`, pos_x, pos_y, table, state })
+      list.push({ key: `${grid_x},${grid_y}`, grid_x, grid_y, table, state })
     }
   }
   return list
 })
 
 function on_select(cell) {
-  if (!cell.table) emit('add', { pos_x: cell.pos_x, pos_y: cell.pos_y })
+  if (!cell.table) emit('add', { grid_x: cell.grid_x, grid_y: cell.grid_y })
   else if (role.value === 'staff') emit('inspect', cell.table)
   else emit('book', cell.table)
 }

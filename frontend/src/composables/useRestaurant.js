@@ -1,5 +1,5 @@
 import { reactive, ref, computed } from 'vue'
-import * as api from '../api/mock_api'
+import * as api from '../services/api'
 import { useToasts } from './useToasts'
 
 const { push_toast } = useToasts()
@@ -21,8 +21,8 @@ const deleting_ids = ref([])
 
 const filters = reactive({
   date: api.today_iso(),
-  start_hour: 19,
-  duration_hours: 2,
+  start_time: 19,
+  duration: 2,
   party_size: 2
 })
 

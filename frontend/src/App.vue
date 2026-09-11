@@ -36,7 +36,7 @@ const is_guest = computed(() => role.value === 'guest')
 const floor_title = computed(() => (is_guest.value ? 'Pick a table' : 'Floor plan'))
 const floor_subtitle = computed(() =>
   is_guest.value
-    ? `${format_window(filters.start_hour, filters.duration_hours)}, party of ${filters.party_size}`
+    ? `${format_window(filters.start_time, filters.duration)}, party of ${filters.party_size}`
     : `${tables.value.length} tables placed · ${day_reservations.value.length} bookings on ${format_day(filters.date)}`
 )
 

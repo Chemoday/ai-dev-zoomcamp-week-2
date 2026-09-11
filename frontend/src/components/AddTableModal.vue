@@ -4,7 +4,7 @@ import TableShape from './TableShape.vue'
 import { useRestaurant } from '../composables/useRestaurant'
 import { useToasts } from '../composables/useToasts'
 import { TYPE_NOTE } from '../utils/format'
-import { TYPE_CAPACITY } from '../api/mock_api'
+import { TYPE_CAPACITY } from '../services/api'
 
 const props = defineProps({ slot_position: { type: Object, required: true } })
 const emit = defineEmits(['close'])
@@ -50,8 +50,8 @@ async function submit() {
       table_number: parsed_number.value,
       capacity: parseInt(form.capacity, 10) || TYPE_CAPACITY[form.table_type],
       table_type: form.table_type,
-      pos_x: props.slot_position.pos_x,
-      pos_y: props.slot_position.pos_y
+      grid_x: props.slot_position.grid_x,
+      grid_y: props.slot_position.grid_y
     })
     push_toast('Table added')
     emit('close')
@@ -76,7 +76,7 @@ async function submit() {
       <div>
         <p class="font-display text-xl">Add a table</p>
         <p class="text-[13px] text-text-secondary">
-          Position row {{ slot_position.pos_y + 1 }}, column {{ slot_position.pos_x + 1 }}
+          Position row {{ slot_position.grid_y + 1 }}, column {{ slot_position.grid_x + 1 }}
         </p>
       </div>
 
