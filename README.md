@@ -17,7 +17,8 @@ for the step-by-step build plan.
 ## Status
 
 In progress — see [`_plan/roadmap.md`](_plan/roadmap.md) for current
-phase. Run instructions below will apply once each part is scaffolded.
+phase. The frontend prototype runs standalone against mocked data; the
+backend is implemented but not yet wired up to the frontend (Phase 3).
 
 ## Running locally
 
@@ -27,7 +28,7 @@ phase. Run instructions below will apply once each part is scaffolded.
 cd backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install fastapi "uvicorn[standard]" sqlalchemy pydantic
+pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -42,6 +43,13 @@ npm run dev
 ```
 
 App: http://localhost:5173
+
+### Tests
+
+```bash
+source backend/venv/bin/activate
+pytest
+```
 
 ## Repository layout
 

@@ -42,15 +42,23 @@ takes a required `party_size` and returns one entry per table
 (`is_reserved`/`fits_party`/`is_available`) instead of a bare boolean
 map, and `table_number` is an integer, not the spec's string example.
 
-## 4. Phase 2 — FastAPI backend
-- [ ] Scaffold `backend/app/` (`main.py`, `database.py`, `models.py`,
+## 4. Phase 2 — FastAPI backend — done
+- [x] Scaffold `backend/app/` (`main.py`, `database.py`, `models.py`,
       `schemas.py`, `crud.py`) per spec section 2's directory layout
-- [ ] Implement endpoints against `openapi.yaml` / spec section 4,
-      backed by SQLite via SQLAlchemy (see spec section 7 for seeding:
-      `Base.metadata.create_all`, no Alembic, auto-seed 5 tables on
-      first startup)
-- [ ] Write backend tests for the key endpoints (add/list/book/delete,
+- [x] Implement endpoints against `openapi.yaml` / spec section 4,
+      backed by SQLite via SQLAlchemy (`Base.metadata.create_all` in a
+      lifespan handler, no Alembic, per spec section 7)
+- [x] Write backend tests for the key endpoints (add/list/book/delete,
       availability/overlap logic, delete-with-active-reservations guard)
+
+17 tests pass (`tests/test_tables.py`, `test_availability.py`,
+`test_reservations.py`), each against a fresh in-memory SQLite DB
+(`tests/conftest.py`). Manually smoke-tested with `uvicorn` + `curl`
+and confirmed the generated `/openapi.json` paths match `openapi.yaml`.
+Seeds the same 9 tables as `frontend/src/services/api.js` (not the 5
+from `product-spec.md` §7.1, which also used string table numbers) so
+Phase 3 integration shows an identical floor plan to what the frontend
+was built against.
 
 ## 5. Phase 3 — Integration
 - [ ] Flip `USE_MOCKS = false` in `frontend/src/services/api.js`,
