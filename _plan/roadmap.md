@@ -9,20 +9,31 @@ here — that's Module 3.
 - [x] `product-spec.md` written: scope, stack, business logic, API
       contract, UI/UX spec, and AI-generation guardrails
 
-## 2. Phase 1 — Frontend first, with a mock layer
-- [ ] Read `docs/ui-spec.md` for the full screen/state/transition brief
+## 2. Phase 1 — Frontend first, with a mock layer — done
+- [x] Read `docs/ui-spec.md` for the full screen/state/transition brief
       before generating any frontend code
-- [ ] Initialize Vite + Vue 3 + Tailwind CSS project in `frontend/`
-- [ ] Implement `src/services/api.js`: in-memory/`localStorage` mock
-      store (5 default tables, 2 initial reservations, ~200ms simulated
-      network delay), matching the contract in spec section 4
-- [ ] Build components: `AppHeader`, `FilterBar`, `FloorGrid`,
-      `TableCell`, `ReservationModal`, `AdminDrawer`
-- [ ] Verify full client-side reactivity against mocks (party size
+- [x] Initialize Vite + Vue 3 + Tailwind CSS project in `frontend/`
+- [x] Implement `src/api/mock_api.js`: in-memory mock store (9 default
+      tables, 4 initial reservations, ~200ms simulated network delay),
+      matching the contract in spec section 4
+- [x] Build components: `AppHeader`, `FilterBar`, `FloorGrid`,
+      `FloorCell`/`TableShape`, `ReservationModal`, `AddTableModal`,
+      `AdminDrawer`, `ReservationsList`, `ToastStack`, `DemoPanel`
+- [x] Verify full client-side reactivity against mocks (party size
       changes, booking, role toggle, adding/deleting tables) — no real
       backend yet
 
+Built with Claude Design, committed raw. **Known drift to reconcile in
+step 3**: the mock API uses `pos_x`/`pos_y` and
+`start_hour`/`duration_hours`, while `product-spec.md` §4 specifies
+`grid_x`/`grid_y` and `start_time`/`duration`; the file also lives at
+`src/api/mock_api.js` rather than the spec's suggested
+`src/services/api.js`. Decide whether `openapi.yaml` follows the spec's
+original names or the frontend's actual names before writing it.
+
 ## 3. Formalize the OpenAPI contract
+- [ ] Resolve the field-naming drift noted above (grid_x/grid_y vs
+      pos_x/pos_y, start_time/duration vs start_hour/duration_hours)
 - [ ] Write `openapi.yaml` from spec section 4 (Table/Reservation
       schemas, all REST endpoints, error responses) — this becomes the
       binding contract both sides implement against from here on

@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface text-text-primary font-body;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display font-normal leading-tight;
+  }
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid theme('colors.accent');
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgba(198, 113, 57, 0.3);
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-field border border-transparent
+           px-4 py-2 font-display text-sm leading-tight cursor-pointer transition-colors
+           disabled:opacity-45 disabled:cursor-not-allowed;
+  }
+  .btn-primary { @apply bg-accent text-surface hover:bg-accent-hover active:bg-accent-press; }
+  .btn-secondary { @apply border-border-default hover:bg-black/5 active:bg-black/10; }
+  .btn-ghost { @apply text-accent-press px-2 hover:bg-accent/10; }
+  .btn-icon { @apply h-9 w-9 p-0; }
+  .btn-block { @apply w-full; }
+
+  .field-label { @apply block text-xs text-text-secondary mb-1.5; }
+  .input {
+    @apply w-full min-h-9 rounded-field border border-border-default bg-surface-raised
+           px-3.5 py-1.5 text-sm text-text-primary transition-colors
+           hover:border-neutral-400 focus-visible:border-accent;
+  }
+  .input-invalid { @apply border-accent-hover; }
+
+  .card { @apply rounded-card bg-surface-raised p-4; }
+  .tag {
+    @apply inline-flex items-center rounded-field px-2.5 py-0.5 text-[10px] uppercase tracking-wider;
+  }
+}
