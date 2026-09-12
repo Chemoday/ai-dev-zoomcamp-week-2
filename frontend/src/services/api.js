@@ -13,7 +13,10 @@ export const USE_MOCKS = false
 // "restaurant-backend.onrender.com" - no scheme, no /api suffix.
 // Falls back to the local dev backend when unset.
 const API_HOST = import.meta.env.VITE_API_BASE
-const API_BASE = API_HOST ? `https://${API_HOST}/api` : 'http://localhost:8000/api'
+// Exported so the UI can link to the backend directly (e.g. to nudge
+// a sleeping free-tier instance awake) without duplicating this logic.
+export const API_ORIGIN = API_HOST ? `https://${API_HOST}` : 'http://localhost:8000'
+const API_BASE = `${API_ORIGIN}/api`
 
 export const today_iso = () => new Date().toISOString().slice(0, 10)
 

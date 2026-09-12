@@ -7,6 +7,7 @@ const TABLE = { id: 1, table_number: 1, capacity: 2, table_type: 'ROUND_2', grid
 
 vi.mock('../src/services/api', () => ({
   USE_MOCKS: true,
+  API_ORIGIN: 'http://localhost:8000',
   today_iso: () => '2024-01-01',
   TYPE_CAPACITY: { ROUND_2: 2, RECT_4: 4, LONG_6: 6 },
   demo_flags: { force_conflict: false, force_network: false },

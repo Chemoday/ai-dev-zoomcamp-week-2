@@ -11,7 +11,7 @@ import ToastStack from './components/ToastStack.vue'
 import DemoPanel from './components/DemoPanel.vue'
 import { useRestaurant } from './composables/useRestaurant'
 import { format_window, format_day } from './utils/format'
-import { USE_MOCKS } from './services/api'
+import { USE_MOCKS, API_ORIGIN } from './services/api'
 
 const {
   role,
@@ -71,7 +71,15 @@ function open_drawer(table) {
       v-if="load_error"
       class="mx-6 mb-3 flex items-center gap-3 rounded-card bg-accent-tint-strong px-4 py-3 text-[13px] text-warning-text"
     >
-      <span class="flex-1">Could not reach the server. The floor plan failed to load.</span>
+      <span class="flex-1">
+        Could not reach the server. On the free hosting tier the
+        backend sleeps after inactivity and can take up to a minute to
+        wake up —
+        <a :href="`${API_ORIGIN}/docs`" target="_blank" rel="noopener" class="underline">
+          open the backend
+        </a>
+        to wake it, then retry.
+      </span>
       <button type="button" class="btn btn-primary text-xs" @click="load_floor">Retry</button>
     </div>
 
