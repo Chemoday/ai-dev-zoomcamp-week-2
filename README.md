@@ -64,6 +64,26 @@ docker pull ghcr.io/chemoday/ai-dev-zoomcamp-week-2-backend:latest
 docker pull ghcr.io/chemoday/ai-dev-zoomcamp-week-2-frontend:latest
 ```
 
+### Deploying to Render
+
+`render.yaml` is a [Blueprint](https://render.com/docs/blueprint-spec)
+that deploys both services from this one repo:
+
+- **`restaurant-backend`** — Docker web service, built from
+  `backend/Dockerfile`
+- **`restaurant-frontend`** — static site, built from `frontend/`
+  (`npm ci && npm run build`), with `VITE_API_BASE` wired to the
+  backend service's host automatically
+
+To deploy: push this repo to GitHub, then in the Render dashboard
+choose **New > Blueprint** and point it at the repo — Render reads
+`render.yaml` and creates both services.
+
+**Free-tier caveat**: Render's free web services have no persistent
+disk, so the backend's SQLite file resets on every redeploy and on the
+automatic spin-down after 15 minutes of inactivity. Fine for a demo;
+not durable storage — see `_plan/roadmap.md` step 9 for details.
+
 ### Tests
 
 ```bash
@@ -84,6 +104,7 @@ product-spec.md            product spec: scope, contract, UI/UX, roadmap
 CLAUDE.md / AGENTS.md       stack + AI-generation guardrails
 openapi.yaml                API contract (frontend <-> backend)
 docker-compose.yml          runs backend + frontend containers together
+render.yaml                 Render Blueprint (deploys both services)
 frontend/                   Vue 3 app (frontend/tests/ has its own smoke test, Dockerfile)
 backend/                    FastAPI app (Dockerfile)
 tests/                      backend unit tests

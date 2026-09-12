@@ -167,6 +167,53 @@ Explicitly requested by the user, ahead of this module's normal scope:
   `...-frontend:v0.1.0` (verified via the anonymous GHCR registry API,
   not just "the workflow said success").
 
+## 9. Deploy to Render (also pulled forward from Module 3)
+
+`render.yaml` is a [Blueprint](https://render.com/docs/blueprint-spec)
+deploying both services from this monorepo, verified against Render's
+own schema docs before writing it:
+
+- `restaurant-backend`: `runtime: docker`, `dockerfilePath`/
+  `dockerContext` pointing at `backend/` (a monorepo needs these -
+  Render doesn't infer a subdirectory Dockerfile on its own)
+- `restaurant-frontend`: `runtime: static`, `rootDir: frontend`,
+  built with `npm ci && npm run build`; `VITE_API_BASE` is wired to
+  the backend service's host via `fromService` / `property: host`, so
+  the two services link up automatically without hardcoding a URL
+
+Two real bugs fixed to make this actually work in production, not just
+locally:
+- `frontend/src/services/api.js` hardcoded `http://localhost:8000/api`
+  - would have silently pointed the deployed frontend at the visitor's
+  own machine. Now reads `import.meta.env.VITE_API_BASE` (a Vite
+  build-time env var) and falls back to localhost only when unset.
+  Verified by building with `VITE_API_BASE=restaurant-backend.onrender.com`
+  set and grepping the output bundle for the injected hostname (present)
+  and for the literal string `VITE_API_BASE` (absent, confirming it was
+  inlined, not left as a runtime lookup).
+- `backend/Dockerfile`'s `CMD` hardcoded `--port 8000`, but Render (and
+  most PaaS) inject a `PORT` env var the container must listen on
+  instead. Changed to shell-form `CMD` expanding `${PORT:-8000}` (still
+  defaults to 8000 for `docker-compose`/plain `docker run`, where
+  `PORT` isn't set).
+
+**Free-tier caveat, documented rather than hidden**: Render's free web
+services have no persistent disk, so the backend's SQLite file resets
+on every redeploy and on the automatic spin-down after 15 minutes of
+inactivity. Acceptable for a demo deployment; not durable storage.
+Not fixed here since switching to a persisted store is a bigger change
+than this request asked for.
+
+**Not independently verified end-to-end**: unlike the Docker/GHCR work,
+this session has no Render account access, so the actual Blueprint
+deploy could not be triggered or watched from here. The user creates
+the Blueprint manually on Render after this file is pushed; everything
+above was verified as far as possible without that access (Render's
+own schema docs, a real Vite build with the env var set, byte-level
+bundle inspection). If Render's actual runtime behavior for `property:
+host` differs from the docs, `VITE_API_BASE` may need a manual
+override in the Render dashboard.
+
 ## Notes
 - Frontend-before-backend, mocked-before-real is intentional — it lets
   the UI drive what the contract actually needs to be, instead of

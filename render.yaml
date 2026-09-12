@@ -1,0 +1,33 @@
+# Render Blueprint - https://render.com/docs/blueprint-spec
+#
+# Two services from this one monorepo:
+#   - restaurant-backend: FastAPI, built from backend/Dockerfile
+#   - restaurant-frontend: static Vite build, served by Render directly
+#
+# NOTE (free tier): Render's free web services have no persistent disk,
+# so the backend's SQLite file resets on every redeploy and on the
+# automatic spin-down after 15 minutes of inactivity. Fine for a demo;
+# not durable storage. See docs/ai-usage-report.md / README.md.
+
+services:
+  - name: restaurant-backend
+    type: web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/tables
+
+  - name: restaurant-frontend
+    type: web
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE
+        fromService:
+          name: restaurant-backend
+          type: web
+          property: host

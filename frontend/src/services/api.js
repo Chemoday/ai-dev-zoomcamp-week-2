@@ -7,7 +7,13 @@
  */
 
 export const USE_MOCKS = false
-const API_BASE = 'http://localhost:8000/api'
+
+// VITE_API_BASE is set at build time (see render.yaml, which links it
+// to the backend service's host) to just a hostname, e.g.
+// "restaurant-backend.onrender.com" - no scheme, no /api suffix.
+// Falls back to the local dev backend when unset.
+const API_HOST = import.meta.env.VITE_API_BASE
+const API_BASE = API_HOST ? `https://${API_HOST}/api` : 'http://localhost:8000/api'
 
 export const today_iso = () => new Date().toISOString().slice(0, 10)
 
