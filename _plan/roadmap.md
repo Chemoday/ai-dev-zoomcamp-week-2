@@ -60,13 +60,30 @@ from `product-spec.md` §7.1, which also used string table numbers) so
 Phase 3 integration shows an identical floor plan to what the frontend
 was built against.
 
-## 5. Phase 3 — Integration
-- [ ] Flip `USE_MOCKS = false` in `frontend/src/services/api.js`,
+## 5. Phase 3 — Integration — done
+- [x] Flip `USE_MOCKS = false` in `frontend/src/services/api.js`,
       point real `fetch`/`axios` calls at `http://localhost:8000/api`
-- [ ] Test end-to-end: reserve a table as guest → status turns
+- [x] Test end-to-end: reserve a table as guest → status turns
       red/reserved → row persists in SQLite; switch to staff view →
       delete a table → deletion-safety guard triggers if it has active
       bookings
+
+`services/api.js` now dispatches every exported function to either the
+mock store or a real `fetch` against the backend based on `USE_MOCKS`
+(currently `false`), so components never needed to change. The
+mock-only "Demo states" panel (`DemoPanel.vue`) is now gated behind
+`USE_MOCKS` in `AppHeader.vue`/`App.vue` since its error-simulation
+flags and reset/clear actions don't apply to a real backend.
+
+Verified end-to-end by running the real backend and driving
+`frontend/src/services/api.js` directly with Node (it's a plain ES
+module, no bundler magic) against it: guest booking → table turns
+reserved and the reservation persists via `GET /api/reservations`;
+overlapping booking → `409`; staff delete of a table with active
+bookings → blocked with `400`; staff add + delete of a table without
+bookings → succeeds. Also confirmed the backend's CORS headers permit
+the Vite dev origin (`http://localhost:5173`), and `npm run build`
+still succeeds with `USE_MOCKS = false`.
 
 ## 6. Tests wrap-up
 - [ ] Confirm backend unit tests cover the behavior in the spec and

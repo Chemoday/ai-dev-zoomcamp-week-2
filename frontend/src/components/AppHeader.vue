@@ -1,5 +1,6 @@
 <script setup>
 import { useRestaurant } from '../composables/useRestaurant'
+import { USE_MOCKS } from '../services/api'
 
 defineProps({ demo_open: { type: Boolean, default: false } })
 defineEmits(['toggle-demo'])
@@ -27,7 +28,12 @@ const { role, set_role } = useRestaurant()
       </button>
     </div>
 
-    <button type="button" class="btn btn-secondary text-[13px]" @click="$emit('toggle-demo')">
+    <button
+      v-if="USE_MOCKS"
+      type="button"
+      class="btn btn-secondary text-[13px]"
+      @click="$emit('toggle-demo')"
+    >
       Demo states
     </button>
   </header>

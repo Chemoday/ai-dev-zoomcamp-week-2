@@ -17,8 +17,9 @@ for the step-by-step build plan.
 ## Status
 
 In progress — see [`_plan/roadmap.md`](_plan/roadmap.md) for current
-phase. The frontend prototype runs standalone against mocked data; the
-backend is implemented but not yet wired up to the frontend (Phase 3).
+phase. Frontend and backend are integrated: run both servers below and
+the app talks to the real FastAPI + SQLite backend. Remaining work is
+test coverage polish and final wrap-up docs.
 
 ## Running locally
 

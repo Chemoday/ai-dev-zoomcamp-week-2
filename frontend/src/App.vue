@@ -11,6 +11,7 @@ import ToastStack from './components/ToastStack.vue'
 import DemoPanel from './components/DemoPanel.vue'
 import { useRestaurant } from './composables/useRestaurant'
 import { format_window, format_day } from './utils/format'
+import { USE_MOCKS } from './services/api'
 
 const {
   role,
@@ -54,7 +55,7 @@ function open_drawer(table) {
 <template>
   <div class="relative flex min-h-screen flex-col">
     <AppHeader :demo_open="demo_open" @toggle-demo="demo_open = !demo_open" />
-    <DemoPanel v-if="demo_open" @close="demo_open = false" />
+    <DemoPanel v-if="demo_open && USE_MOCKS" @close="demo_open = false" />
 
     <div
       v-if="banner_open && role === 'staff'"

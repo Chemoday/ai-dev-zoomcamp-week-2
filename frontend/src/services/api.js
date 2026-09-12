@@ -1,17 +1,77 @@
 /**
- * Mock API — mirrors the endpoints in product-spec.md §4.
+ * API layer — mirrors the endpoints in openapi.yaml.
  * Shapes are snake_case, hours are integers, dates are ISO (YYYY-MM-DD).
- * Every call resolves after ~200ms; failures reject with { status, message }.
+ * Every exported function resolves the same shape and rejects with
+ * { status, message } whether USE_MOCKS is on or off, so components
+ * never need to know which one is active.
  */
 
-const LATENCY = 200
+export const USE_MOCKS = false
+const API_BASE = 'http://localhost:8000/api'
 
 export const today_iso = () => new Date().toISOString().slice(0, 10)
 
 export const TYPE_CAPACITY = { ROUND_2: 2, RECT_4: 4, LONG_6: 6 }
 
-/** Demo switches the UI can flip to exercise error paths. */
+/** Demo switches the UI can flip to exercise error paths (mock mode only). */
 export const demo_flags = { force_conflict: false, force_network: false }
+
+// ---------------------------------------------------------------------------
+// Real backend (USE_MOCKS = false)
+// ---------------------------------------------------------------------------
+
+async function real_request(path, { method = 'GET', params, body } = {}) {
+  const query = params
+    ? '?' + new URLSearchParams(
+        Object.entries(params).filter(([, v]) => v !== undefined && v !== null)
+      )
+    : ''
+
+  let response
+  try {
+    response = await fetch(`${API_BASE}${path}${query}`, {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined
+    })
+  } catch {
+    throw { status: 0, message: 'Network error — could not reach the server' }
+  }
+
+  if (!response.ok) {
+    let message = `Request failed with status ${response.status}.`
+    try {
+      const error_body = await response.json()
+      message = error_body.detail || message
+    } catch {
+      // response had no JSON body — keep the generic message
+    }
+    throw { status: response.status, message }
+  }
+
+  if (response.status === 204) return null
+  return response.json()
+}
+
+const real_fetch_tables = () => real_request('/tables')
+
+const real_fetch_availability = ({ date, start_time, duration, party_size }) =>
+  real_request('/availability', { params: { date, start_time, duration, party_size } })
+
+const real_fetch_reservations = (date) => real_request('/reservations', { params: { date } })
+
+const real_create_reservation = (payload) =>
+  real_request('/reservations', { method: 'POST', body: payload })
+
+const real_create_table = (payload) => real_request('/tables', { method: 'POST', body: payload })
+
+const real_delete_table = (table_id) => real_request(`/tables/${table_id}`, { method: 'DELETE' })
+
+// ---------------------------------------------------------------------------
+// Mock, in-memory backend (USE_MOCKS = true)
+// ---------------------------------------------------------------------------
+
+const LATENCY = 200
 
 let db = null
 
@@ -38,7 +98,7 @@ function seed() {
     next_id: 100
   }
 }
-seed()
+if (USE_MOCKS) seed()
 
 function respond(value) {
   return new Promise((resolve, reject) => {
@@ -63,14 +123,10 @@ function overlaps(reservation, date, start_time, duration) {
   )
 }
 
-/** GET /api/tables */
-export function fetch_tables() {
-  return respond(() => clone(db.tables))
-}
+const mock_fetch_tables = () => respond(() => clone(db.tables))
 
-/** GET /api/availability?date=&start_time=&duration=&party_size= */
-export function fetch_availability({ date, start_time, duration, party_size }) {
-  return respond(() =>
+const mock_fetch_availability = ({ date, start_time, duration, party_size }) =>
+  respond(() =>
     db.tables.map((table) => {
       const is_reserved = db.reservations.some(
         (r) => r.table_id === table.id && overlaps(r, date, start_time, duration)
@@ -83,19 +139,15 @@ export function fetch_availability({ date, start_time, duration, party_size }) {
       }
     })
   )
-}
 
-/** GET /api/reservations?date= */
-export function fetch_reservations(date) {
-  return respond(() =>
+const mock_fetch_reservations = (date) =>
+  respond(() =>
     clone(db.reservations.filter((r) => !date || r.reservation_date === date))
       .sort((a, b) => a.start_time - b.start_time)
   )
-}
 
-/** POST /api/reservations */
-export function create_reservation(payload) {
-  return respond(() => {
+const mock_create_reservation = (payload) =>
+  respond(() => {
     const conflict =
       demo_flags.force_conflict ||
       db.reservations.some(
@@ -111,11 +163,9 @@ export function create_reservation(payload) {
     db.reservations.push(reservation)
     return clone(reservation)
   })
-}
 
-/** POST /api/tables */
-export function create_table(payload) {
-  return respond(() => {
+const mock_create_table = (payload) =>
+  respond(() => {
     const taken =
       demo_flags.force_conflict ||
       db.tables.some(
@@ -131,11 +181,9 @@ export function create_table(payload) {
     db.tables.push(table)
     return clone(table)
   })
-}
 
-/** DELETE /api/tables/:id */
-export function delete_table(table_id) {
-  return respond(() => {
+const mock_delete_table = (table_id) =>
+  respond(() => {
     const date = today_iso()
     const has_bookings = db.reservations.some(
       (r) => r.table_id === table_id && r.reservation_date >= date
@@ -144,13 +192,41 @@ export function delete_table(table_id) {
     db.tables = db.tables.filter((t) => t.id !== table_id)
     return { ok: true }
   })
-}
 
-/** Demo helpers — not part of the real API. */
+/** Demo helpers — mock mode only, not part of the real API. */
 export function reset_data() {
-  seed()
+  if (USE_MOCKS) seed()
 }
 export function clear_floor() {
-  db.tables = []
-  db.reservations = []
+  if (USE_MOCKS) {
+    db.tables = []
+    db.reservations = []
+  }
 }
+
+// ---------------------------------------------------------------------------
+// Public API — dispatches to mock or real depending on USE_MOCKS
+// ---------------------------------------------------------------------------
+
+/** GET /api/tables */
+export const fetch_tables = () => (USE_MOCKS ? mock_fetch_tables() : real_fetch_tables())
+
+/** GET /api/availability?date=&start_time=&duration=&party_size= */
+export const fetch_availability = (params) =>
+  USE_MOCKS ? mock_fetch_availability(params) : real_fetch_availability(params)
+
+/** GET /api/reservations?date= */
+export const fetch_reservations = (date) =>
+  USE_MOCKS ? mock_fetch_reservations(date) : real_fetch_reservations(date)
+
+/** POST /api/reservations */
+export const create_reservation = (payload) =>
+  USE_MOCKS ? mock_create_reservation(payload) : real_create_reservation(payload)
+
+/** POST /api/tables */
+export const create_table = (payload) =>
+  USE_MOCKS ? mock_create_table(payload) : real_create_table(payload)
+
+/** DELETE /api/tables/:id */
+export const delete_table = (table_id) =>
+  USE_MOCKS ? mock_delete_table(table_id) : real_delete_table(table_id)
