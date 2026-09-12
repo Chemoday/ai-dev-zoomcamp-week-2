@@ -26,8 +26,13 @@ services:
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     envVars:
+      # NOTE: fromService's `host` property resolves to Render's
+      # *internal* private-networking hostname (e.g. "restaurant-backend-9ce6",
+      # no domain) - only reachable from other Render services, not from
+      # a browser. This static site's JS runs in the visitor's browser,
+      # not inside Render's network, so it needs the real public
+      # hostname instead. Hardcoded because of that; if this Blueprint
+      # is ever recreated (new random suffix), update this to match
+      # the backend service's actual onrender.com hostname.
       - key: VITE_API_BASE
-        fromService:
-          name: restaurant-backend
-          type: web
-          property: host
+        value: restaurant-backend-9ce6.onrender.com
