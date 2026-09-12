@@ -86,9 +86,28 @@ the Vite dev origin (`http://localhost:5173`), and `npm run build`
 still succeeds with `USE_MOCKS = false`.
 
 ## 6. Tests wrap-up
-- [ ] Confirm backend unit tests cover the behavior in the spec and
+- [x] Confirm backend unit tests cover the behavior in the spec and
       contract
 - [ ] Add a frontend smoke test covering the main guest booking flow
+
+Extensive backend testing pass (38 tests total, up from 17):
+- `tests/test_validation.py` (14 tests): 422s for bad `table_type`,
+  out-of-range `grid_x`/`grid_y`, missing fields, out-of-range
+  `start_time`/`duration`, empty `customer_name`, malformed dates, and
+  missing/invalid `party_size` on `/api/availability`.
+- `tests/test_overlap_boundaries.py` (7 tests): exercises the exact
+  overlap formula from product-spec.md §3.3 — back-to-back bookings
+  that only touch are allowed, any real overlap (partial, nested,
+  identical) conflicts, different tables/dates never conflict.
+- **Bug found and fixed**: `start_time` (10-21) and `duration` (1-4)
+  were validated independently, so a booking could run past the 22:00
+  close (e.g. `start_time=21, duration=2` → ends at 23:00). Added a
+  `model_validator` on `ReservationCreate` (`backend/app/schemas.py`)
+  enforcing `start_time + duration <= 22`, plus the same check in the
+  `/api/availability` handler. This also caught the *same* bug already
+  present in the seed data (Dala Okonkwo's booking, `21:00 + 2h`) —
+  fixed in both `backend/app/main.py` and `frontend/src/services/api.js`
+  (duration `2` → `1`) so the seeded demo data is valid in both places.
 
 ## 7. Wrap-up deliverables
 - [ ] `README.md` — how to run frontend + backend locally (see spec
