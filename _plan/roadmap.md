@@ -142,11 +142,30 @@ Runs locally per `README.md`, persists in SQLite, passes its own tests
 
 `module_syllabus.md` §9 additionally lists `/docker-compose.yml` and
 `/.github/workflows` — the latter now exists (added for test-on-push
-CI, matching this module's "verify each step" spirit); `docker-compose.yml`
-is intentionally still absent, since containerization/deployment is
-explicitly Module 3 per `_plan/lesson.md` and the top of this file.
+CI, matching this module's "verify each step" spirit).
 
 Module 2 is complete.
+
+## 8. Containerization and release (pulled forward from Module 3)
+
+Explicitly requested by the user, ahead of this module's normal scope:
+
+- `backend/Dockerfile` (python:3.10-slim + uvicorn), `frontend/Dockerfile`
+  (multi-stage node build served via nginx), and a root
+  `docker-compose.yml` running both together with SQLite persisted in
+  a named volume (`backend/app/database.py`'s db path is now
+  configurable via `DATABASE_PATH` for this).
+- `.github/workflows/release.yml`: on a published GitHub Release,
+  builds and pushes both images to GitHub Container Registry (ghcr.io),
+  tagged with the release tag and `latest`.
+- `.github/workflows/tests.yml` gained a `docker-build` job (build
+  only, no push) on every push to `main`, since this sandbox has no
+  working Docker daemon to verify Dockerfiles locally.
+- Cut release `v0.1.0`, confirmed both images built, pushed, and are
+  publicly pullable:
+  `ghcr.io/chemoday/ai-dev-zoomcamp-week-2-backend:v0.1.0` and
+  `...-frontend:v0.1.0` (verified via the anonymous GHCR registry API,
+  not just "the workflow said success").
 
 ## Notes
 - Frontend-before-backend, mocked-before-real is intentional — it lets
