@@ -42,7 +42,7 @@ def seed_if_empty(db: Session) -> None:
     seed_reservations = [
         {"table_id": by_number[2], "customer_name": "Marguerite Hale", "customer_phone": "(555) 014 8820", "reservation_date": today, "start_time": 18, "duration": 3},
         {"table_id": by_number[5], "customer_name": "Ivo Brandt", "customer_phone": "(555) 902 1177", "reservation_date": today, "start_time": 19, "duration": 3},
-        {"table_id": by_number[7], "customer_name": "Dala Okonkwo", "customer_phone": "(555) 771 3390", "reservation_date": today, "start_time": 21, "duration": 2},
+        {"table_id": by_number[7], "customer_name": "Dala Okonkwo", "customer_phone": "(555) 771 3390", "reservation_date": today, "start_time": 21, "duration": 1},
         {"table_id": by_number[3], "customer_name": "Petra Lindqvist", "customer_phone": "(555) 336 0042", "reservation_date": today, "start_time": 12, "duration": 2},
     ]
     db.add_all(models.Reservation(**data) for data in seed_reservations)
@@ -104,6 +104,11 @@ def get_availability(
     party_size: int = Query(..., ge=1),
     db: Session = Depends(get_db),
 ):
+    if start_time + duration > schemas.CLOSING_HOUR:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Window must end by {schemas.CLOSING_HOUR}:00 (start_time + duration exceeds closing).",
+        )
     return crud.get_availability(db, date, start_time, duration, party_size)
 
 

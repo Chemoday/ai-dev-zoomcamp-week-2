@@ -92,7 +92,7 @@ function seed() {
     reservations: [
       { id: 1, table_id: 2, customer_name: 'Marguerite Hale', customer_phone: '(555) 014 8820', reservation_date: date, start_time: 18, duration: 3 },
       { id: 2, table_id: 5, customer_name: 'Ivo Brandt', customer_phone: '(555) 902 1177', reservation_date: date, start_time: 19, duration: 3 },
-      { id: 3, table_id: 7, customer_name: 'Dala Okonkwo', customer_phone: '(555) 771 3390', reservation_date: date, start_time: 21, duration: 2 },
+      { id: 3, table_id: 7, customer_name: 'Dala Okonkwo', customer_phone: '(555) 771 3390', reservation_date: date, start_time: 21, duration: 1 },
       { id: 4, table_id: 3, customer_name: 'Petra Lindqvist', customer_phone: '(555) 336 0042', reservation_date: date, start_time: 12, duration: 2 }
     ],
     next_id: 100

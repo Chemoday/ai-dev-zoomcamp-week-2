@@ -1,7 +1,10 @@
 from datetime import date
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
+
+# Operating hours per product-spec.md section 3.2: 10:00-22:00.
+CLOSING_HOUR = 22
 
 
 class TableType(str, Enum):
@@ -43,6 +46,14 @@ class ReservationCreate(BaseModel):
     reservation_date: date
     start_time: int = Field(ge=10, le=21)
     duration: int = Field(ge=1, le=4)
+
+    @model_validator(mode="after")
+    def _within_operating_hours(self):
+        if self.start_time + self.duration > CLOSING_HOUR:
+            raise ValueError(
+                f"Reservation must end by {CLOSING_HOUR}:00 (start_time + duration exceeds closing)."
+            )
+        return self
 
 
 class Reservation(ReservationCreate):
