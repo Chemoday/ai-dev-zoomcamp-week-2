@@ -1,4 +1,5 @@
-export const HOURS = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+// Matches the backend's valid start_time range (product-spec.md section 3.2).
+export const HOURS = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
 
 export const TYPE_LABEL = { ROUND_2: 'Round', RECT_4: 'Rect', LONG_6: 'Long' }
 
