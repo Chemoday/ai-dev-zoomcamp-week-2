@@ -21,7 +21,7 @@ services:
   - name: restaurant-frontend
     type: web
     runtime: static
-    plan: free
+    # Static sites have no `plan` field - they're always free on Render.
     rootDir: frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
