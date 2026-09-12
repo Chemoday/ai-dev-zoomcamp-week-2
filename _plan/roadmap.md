@@ -123,12 +123,30 @@ the valid 10:00 opening slot. Fixed to `[10..21]`. Also added the
 missing "4 hours" option to `ReservationModal`'s duration picker (the
 backend allows 1-4, the UI only offered 1-3).
 
-## 7. Wrap-up deliverables
-- [ ] `README.md` — how to run frontend + backend locally (see spec
+## 7. Wrap-up deliverables — done
+- [x] `README.md` — how to run frontend + backend locally (see spec
       section 7.2 for the quickstart commands)
-- [ ] `docs/ai-usage-report.md` — log where/how AI tools were used
-- [ ] Confirm the repo matches the Module 2 deliverable list from
+- [x] `docs/ai-usage-report.md` — log where/how AI tools were used
+- [x] Confirm the repo matches the Module 2 deliverable list from
       `_plan/lesson.md` / `_plan/module_syllabus.md`
+
+`docs/ai-usage-report.md` filled in with a real, dated log (sourced
+from `git log`) of every AI-assisted step and how each was verified,
+per `_plan/lesson.md`'s "verify each step" principle.
+
+Final deliverable check against `_plan/lesson.md`'s list — all present:
+`product-spec.md`, `AGENTS.md` (+ `CLAUDE.md`), `frontend/`, `backend/`,
+`openapi.yaml`, `tests/` (+ `frontend/tests/`), `docs/ai-usage-report.md`.
+Runs locally per `README.md`, persists in SQLite, passes its own tests
+(38 backend + 1 frontend, both green in CI).
+
+`module_syllabus.md` §9 additionally lists `/docker-compose.yml` and
+`/.github/workflows` — the latter now exists (added for test-on-push
+CI, matching this module's "verify each step" spirit); `docker-compose.yml`
+is intentionally still absent, since containerization/deployment is
+explicitly Module 3 per `_plan/lesson.md` and the top of this file.
+
+Module 2 is complete.
 
 ## Notes
 - Frontend-before-backend, mocked-before-real is intentional — it lets

@@ -18,11 +18,11 @@ for the step-by-step build plan.
 
 ## Status
 
-In progress — see [`_plan/roadmap.md`](_plan/roadmap.md) for current
-phase. Frontend and backend are integrated: run both servers below and
-the app talks to the real FastAPI + SQLite backend. Both have test
-coverage (38 backend tests, a frontend smoke test). Remaining work is
-final wrap-up docs.
+Module 2 complete — see [`_plan/roadmap.md`](_plan/roadmap.md) for the
+full build history. Frontend and backend are integrated: run both
+servers below and the app talks to the real FastAPI + SQLite backend.
+Both have test coverage (38 backend tests, a frontend smoke test),
+enforced on every push to `main` via CI.
 
 ## Running locally
 
