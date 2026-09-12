@@ -1,5 +1,7 @@
 # Interactive Restaurant Table Reservation System
 
+[![Tests](https://github.com/Chemoday/ai-dev-zoomcamp-week-2/actions/workflows/tests.yml/badge.svg)](https://github.com/Chemoday/ai-dev-zoomcamp-week-2/actions/workflows/tests.yml)
+
 Module 2 project for the AI-dev Zoomcamp: a full-stack MVP for
 restaurant table reservations and floor management, built with a
 frontend-first, contract-driven workflow.
