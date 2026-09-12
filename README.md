@@ -48,6 +48,22 @@ npm run dev
 
 App: http://localhost:5173
 
+### With Docker
+
+```bash
+docker compose up --build
+```
+
+Backend: http://localhost:8000/docs · Frontend: http://localhost:5173
+(SQLite data persists in the `backend_data` named volume across
+restarts.) Released versions are also published to GitHub Container
+Registry — see [Releases](../../releases) for image tags, e.g.:
+
+```bash
+docker pull ghcr.io/chemoday/ai-dev-zoomcamp-week-2-backend:latest
+docker pull ghcr.io/chemoday/ai-dev-zoomcamp-week-2-frontend:latest
+```
+
 ### Tests
 
 ```bash
@@ -67,8 +83,9 @@ npm test
 product-spec.md            product spec: scope, contract, UI/UX, roadmap
 CLAUDE.md / AGENTS.md       stack + AI-generation guardrails
 openapi.yaml                API contract (frontend <-> backend)
-frontend/                   Vue 3 app (frontend/tests/ has its own smoke test)
-backend/                    FastAPI app
+docker-compose.yml          runs backend + frontend containers together
+frontend/                   Vue 3 app (frontend/tests/ has its own smoke test, Dockerfile)
+backend/                    FastAPI app (Dockerfile)
 tests/                      backend unit tests
 docs/ai-usage-report.md     log of AI tool usage for this project
 _plan/                      module reference material and roadmap

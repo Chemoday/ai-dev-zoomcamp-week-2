@@ -1,7 +1,12 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./restaurant.db"
+# Overridable so a container can point this at a mounted volume
+# (see docker-compose.yml) without code changes.
+DATABASE_PATH = os.environ.get("DATABASE_PATH", "./restaurant.db")
+SQLALCHEMY_DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
