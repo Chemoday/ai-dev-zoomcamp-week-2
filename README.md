@@ -18,8 +18,9 @@ for the step-by-step build plan.
 
 In progress — see [`_plan/roadmap.md`](_plan/roadmap.md) for current
 phase. Frontend and backend are integrated: run both servers below and
-the app talks to the real FastAPI + SQLite backend. Remaining work is
-test coverage polish and final wrap-up docs.
+the app talks to the real FastAPI + SQLite backend. Both have test
+coverage (38 backend tests, a frontend smoke test). Remaining work is
+final wrap-up docs.
 
 ## Running locally
 
@@ -48,8 +49,14 @@ App: http://localhost:5173
 ### Tests
 
 ```bash
+# backend (38 tests)
 source backend/venv/bin/activate
 pytest
+
+# frontend (smoke test)
+cd frontend
+npm install
+npm test
 ```
 
 ## Repository layout
@@ -58,9 +65,9 @@ pytest
 product-spec.md            product spec: scope, contract, UI/UX, roadmap
 CLAUDE.md / AGENTS.md       stack + AI-generation guardrails
 openapi.yaml                API contract (frontend <-> backend)
-frontend/                   Vue 3 app
+frontend/                   Vue 3 app (frontend/tests/ has its own smoke test)
 backend/                    FastAPI app
-tests/                      backend unit tests + frontend smoke test
+tests/                      backend unit tests
 docs/ai-usage-report.md     log of AI tool usage for this project
 _plan/                      module reference material and roadmap
 ```

@@ -85,10 +85,10 @@ bookings → succeeds. Also confirmed the backend's CORS headers permit
 the Vite dev origin (`http://localhost:5173`), and `npm run build`
 still succeeds with `USE_MOCKS = false`.
 
-## 6. Tests wrap-up
+## 6. Tests wrap-up — done
 - [x] Confirm backend unit tests cover the behavior in the spec and
       contract
-- [ ] Add a frontend smoke test covering the main guest booking flow
+- [x] Add a frontend smoke test covering the main guest booking flow
 
 Extensive backend testing pass (38 tests total, up from 17):
 - `tests/test_validation.py` (14 tests): 422s for bad `table_type`,
@@ -108,6 +108,20 @@ Extensive backend testing pass (38 tests total, up from 17):
   present in the seed data (Dala Okonkwo's booking, `21:00 + 2h`) —
   fixed in both `backend/app/main.py` and `frontend/src/services/api.js`
   (duration `2` → `1`) so the seeded demo data is valid in both places.
+
+Frontend: added Vitest + Vue Test Utils (`frontend/tests/`,
+`npm test`). `booking-flow.spec.js` mocks `services/api` and drives the
+real `App.vue` through the guest flow: see an available table → open
+the reservation modal → submit → success state → modal auto-closes →
+grid re-fetches and shows the table as reserved.
+
+While writing it, found and fixed a real frontend bug: `HOURS` in
+`utils/format.js` was `[11..22]`, but the backend only accepts
+`start_time` in `10..21` (and now also enforces the closing-time rule)
+— so the time picker offered an invalid 22:00 slot and never offered
+the valid 10:00 opening slot. Fixed to `[10..21]`. Also added the
+missing "4 hours" option to `ReservationModal`'s duration picker (the
+backend allows 1-4, the UI only offered 1-3).
 
 ## 7. Wrap-up deliverables
 - [ ] `README.md` — how to run frontend + backend locally (see spec
