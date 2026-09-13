@@ -2,16 +2,16 @@
 
 FastAPI + SQLAlchemy + Pydantic v2 backend, implemented against
 `../openapi.yaml`, backed by SQLite (auto-created and seeded on first
-run, no migrations — see `product-spec.md` section 7.1).
+run, no migrations — see `product-spec.md` section 7.1). Dependencies
+managed with [uv](https://docs.astral.sh/uv/) (`pyproject.toml` +
+`uv.lock`).
 
 ## Run
 
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+uv sync
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
 API docs: http://localhost:8000/docs
@@ -21,6 +21,5 @@ API docs: http://localhost:8000/docs
 From the repo root (uses the top-level `pytest.ini` / `tests/`):
 
 ```bash
-source backend/venv/bin/activate
-pytest
+uv run --project backend pytest
 ```

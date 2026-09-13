@@ -12,7 +12,8 @@ frontend, `_plan/roadmap.md` for the step-by-step plan, and
 - **Frontend**: Vue 3, **Composition API only**, using `<script setup>`
   syntax in every component (no Options API, no bare `setup()`
   function), Vite, Tailwind CSS
-- **Backend**: Python, FastAPI, SQLAlchemy (synchronous ORM), Pydantic v2
+- **Backend**: Python, FastAPI, SQLAlchemy (synchronous ORM), Pydantic v2,
+  dependencies managed with [uv](https://docs.astral.sh/uv/) (not pip/venv)
 - **Database**: SQLite
 
 ## Build order

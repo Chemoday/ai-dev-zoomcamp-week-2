@@ -214,6 +214,32 @@ bundle inspection). If Render's actual runtime behavior for `property:
 host` differs from the docs, `VITE_API_BASE` may need a manual
 override in the Render dashboard.
 
+## 10. Migrate backend dependency management to uv
+
+`module_syllabus.md` Lesson 2.4 specifically calls out "uv dependency
+management" as a topic — the backend had used plain `venv`/`pip` +
+`requirements.txt` instead. Migrated fully rather than just aliasing
+commands:
+
+- `backend/pyproject.toml` (`[project]` deps + a `dev` dependency
+  group for pytest/httpx) and `backend/uv.lock` replace
+  `requirements.txt`; `backend/.python-version` pins `3.10` so local
+  dev matches the Docker image exactly
+- `backend/Dockerfile`: copies the official uv binary
+  (`ghcr.io/astral-sh/uv`), `uv sync --frozen --no-dev` for a
+  reproducible, lean production install, `CMD` runs via `uv run`
+- `.github/workflows/tests.yml`: `astral-sh/setup-uv` + `uv sync` +
+  `uv run --project backend pytest`, replacing `actions/setup-python` +
+  `pip install`
+- `README.md`, `backend/README.md`, `CLAUDE.md`, `AGENTS.md` updated
+
+Verified locally: `uv sync` installs cleanly, `uv run uvicorn ...`
+serves real requests, and `uv run --project backend pytest` (run from
+the repo root, matching how CI invokes it) passes all 38 tests -
+`--project` points uv at the right environment without changing the
+working directory, so the root `pytest.ini`'s `testpaths = tests` /
+`pythonpath = backend` still resolve correctly.
+
 ## Notes
 - Frontend-before-backend, mocked-before-real is intentional — it lets
   the UI drive what the contract actually needs to be, instead of

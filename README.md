@@ -13,7 +13,7 @@ for the step-by-step build plan.
 ## Stack
 
 - **Frontend**: Vue 3 (Composition API, `<script setup>`), Vite, Tailwind CSS
-- **Backend**: Python, FastAPI, SQLAlchemy, Pydantic v2
+- **Backend**: Python, FastAPI, SQLAlchemy, Pydantic v2, [uv](https://docs.astral.sh/uv/)
 - **Database**: SQLite
 
 ## Status
@@ -30,10 +30,8 @@ enforced on every push to `main` via CI.
 
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+uv sync
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
 API docs: http://localhost:8000/docs
@@ -87,9 +85,8 @@ not durable storage — see `_plan/roadmap.md` step 9 for details.
 ### Tests
 
 ```bash
-# backend (38 tests)
-source backend/venv/bin/activate
-pytest
+# backend (38 tests), from the repo root
+uv run --project backend pytest
 
 # frontend (smoke test)
 cd frontend
@@ -106,7 +103,7 @@ openapi.yaml                API contract (frontend <-> backend)
 docker-compose.yml          runs backend + frontend containers together
 render.yaml                 Render Blueprint (deploys both services)
 frontend/                   Vue 3 app (frontend/tests/ has its own smoke test, Dockerfile)
-backend/                    FastAPI app (Dockerfile)
+backend/                    FastAPI app (Dockerfile, pyproject.toml/uv.lock)
 tests/                      backend unit tests
 docs/ai-usage-report.md     log of AI tool usage for this project
 _plan/                      module reference material and roadmap
